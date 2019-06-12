@@ -1,0 +1,64 @@
+---
+title: "Crash course in git"
+author: "Ben Baumer"
+date: "6/12/2019"
+output: html_document
+---
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+# What is version control?
+
+- [Version control](https://en.wikipedia.org/wiki/Version_control)
+- [`git`](https://en.wikipedia.org/wiki/Git)
+- [GitHub](https://en.wikipedia.org/wiki/GitHub)
+- [Happy Git and GitHub for the useR](https://happygitwithr.com/)
+
+# The basics
+
+1. Fork [the course repo](https://github.com/beanumber/learn-bash) on GitHub. 
+2. Clone *your fork* and make a new project in RStudio. 
+3. Add your name, with a link to your GitHub user page, to `README.md`. 
+4. Commit your changes. 
+5. Push
+6. Send a pull request
+7. I will resolve all pull requests
+
+# Collaborating
+
+## I can't push
+
+1. Change your remote to point towards *my* repository. 
+2. Add one sentence about yourself to `README.md`
+3. Commit
+4. Push
+5. I will add you all as collaborators on this repository
+6. One by one, we will push
+
+## I can't pull
+
+1. Add another sentence about yourself to `README.md`
+2. First person, commit and push
+3. Second person
+    #. Pull
+    #. Commit or Revert
+    #. Pull
+    #. Push
+
+## Merge conflicts
+
+- [Diffs](https://en.wikipedia.org/wiki/File_comparison)
+- [`meld`](https://en.wikipedia.org/wiki/Meld_(software))
+- `opendiff`?
+
+1. Edit a sentence about *someone else*
+2. Commit
+3. One by one, push
+
+
+
+
+
+

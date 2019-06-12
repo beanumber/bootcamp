@@ -1,0 +1,197 @@
+---
+title: "Crash course in bash"
+author: "Ben Baumer"
+date: "6/10/2019"
+output: html_document
+---
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+# What is UNIX?
+
+- [Single UNIX specification](https://en.wikipedia.org/wiki/Single_UNIX_Specification)
+- [POSIX](https://en.wikipedia.org/wiki/POSIX)
+- [Unix shell](https://en.wikipedia.org/wiki/Unix_shell)
+- [bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell))
+- [UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)
+
+# Navigating the file system
+
+- [Unix filesystem](https://en.wikipedia.org/wiki/Unix_filesystem)
+- [Filesystem Hierarchy Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)
+
+- `pwd`, `cd`, `ls`, `mkdir`, `~`, `cp`, `rm`
+
+- Print working directory
+
+```{bash}
+pwd
+```
+
+- Move back one directory
+
+```{bash}
+cd ..
+pwd
+```
+
+- Jump back to [home directory](https://en.wikipedia.org/wiki/Home_directory)
+
+
+```{bash}
+cd ~
+pwd
+```
+
+- List contents of directory
+
+```{bash}
+ls
+ls -l
+ls -a
+ls -alhS
+```
+
+- [Symbolic links](https://en.wikipedia.org/wiki/Symbolic_link)
+- [relative vs. absolute paths](https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths)
+
+## Activity
+
+1. Create a directory at the root level of your home directory called `stuff`.
+2. Navigate inside `stuff` and create a directory called `tmp2`.
+3. *Copy* the contents of `/tmp` to `~/stuff/tmp2`.
+4. Create a symbolic link to `/tmp` called `ln_tmp`.
+5. Make sure you understand the difference between `~/stuff/tmp2` and `~/stuff/lm_tmp`.
+6. Delete `stuff`.
+
+# What's happening? 
+
+- `who`
+- `top`, `htop`
+- `free`, `df`
+- `ps`, `kill`
+- `less`
+
+- Who am I?
+
+```{bash}
+who
+whoami
+w
+```
+
+- How much [memory](https://en.wikipedia.org/wiki/Random-access_memory) does this computer have? 
+
+```{bash}
+free -h
+```
+
+- How much [disk space](https://en.wikipedia.org/wiki/Hard_disk_drive) does this computer have? 
+
+```{bash}
+df -h
+```
+
+- What is this computer doing right now? 
+
+```{bash, eval=FALSE}
+ps aux
+```
+
+## Activity
+
+1. Kill a process on your computer (ask me if it's safe!)
+
+# Getting help
+
+- `man`
+
+# Where is it?
+
+- [`find`](https://en.wikipedia.org/wiki/Find_(Unix)), [`locate`](https://en.wikipedia.org/wiki/Locate_(Unix)), [`which`](https://en.wikipedia.org/wiki/Which_(command))
+- [`$PATH` variable](https://en.wikipedia.org/wiki/PATH_(variable))
+- [Environment Variables](https://en.wikipedia.org/wiki/Environment_variable)
+- [`nano`](https://en.wikipedia.org/wiki/GNU_nano), watch out for [`vi`](https://en.wikipedia.org/wiki/Vi)!
+
+```{bash}
+echo $PATH
+```
+
+```{bash}
+locate stuff
+```
+
+```{bash}
+find /usr -name "git"
+```
+
+
+```{bash}
+which git
+```
+
+## Activity
+
+1. Find the `psql` program on your computer
+2. [Amend your `$PATH` variable](https://coolestguidesontheplanet.com/add-shell-path-osx/) to make this program accessible (permanently)
+
+
+# I/O
+
+- [`grep`](https://en.wikipedia.org/wiki/Grep), [`sed`](https://en.wikipedia.org/wiki/Sed)
+- [Standard input/output](https://en.wikipedia.org/wiki/Standard_streams)
+- [Redirection](https://en.wikipedia.org/wiki/Redirection_(computing)), `>`, `<`
+- [Piping](https://en.wikipedia.org/wiki/Pipeline_(Unix)) `|`
+- [`xargs`](https://en.wikipedia.org/wiki/Xargs)
+
+```{bash}
+echo $PATH > my_path.txt
+ls
+wc my_path.txt
+```
+
+```{bash}
+echo $PATH | wc
+```
+
+## Beware of funky characters in filenames returned by `find`
+
+```{bash, eval=FALSE}
+find ~ -name "*.txt" -mtime -7
+find ~ -name "*.txt" -mtime -7 -print0
+```
+
+## Activity
+
+1. List all the files in *all* of the directories in your `$PATH`.
+
+```{bash, eval=FALSE}
+echo $PATH > my_path.txt
+sed 's/:/\n/g' my_path.txt > my_path.csv
+cat my_path.csv | xargs ls
+```
+
+2. Can you do this in one line? 
+
+# Tasks
+
+1. Copy a bunch of files in nested directories to `/tmp`.
+
+```{bash, eval=FALSE}
+find /home/bbaumer/Dropbox/ -type f -name "*.Rmd" -mtime -7 -exec cp -t /tmp {} \;
+
+find /home/bbaumer/Dropbox/ -type f -regex ".+Rproj\.user.+conflicted copy.+\.pper" -print0 | xargs -0 cp -t /tmp
+```
+
+1. Find and replace across files
+
+```{bash, eval=FALSE}
+grep "dplyr" *.Rmd
+sed -i 's/dplyr/hello-dplyr/g' *.Rmd
+grep "hello-dplyr" *.Rmd
+```
+
+2. [Rename](https://www.tecmint.com/rename-multiple-files-in-linux/) a large set of files in nested directories
+
