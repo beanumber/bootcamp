@@ -1,0 +1,183 @@
+---
+title: "Aggregating Results"
+---
+
+# Aggregation
+
+## `GROUP BY`
+
+- ["Roll Up"](http://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-GROUPBY) tables
+
+## `HAVING`
+
+- Filter the [**result set**](http://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-HAVING)
+- Analogous to `WHERE` but different. (Why?)
+- Always use `WHERE` when you can. (Why?)
+- Compare:
+    - `SELECT sum(1) as N FROM flights WHERE dest = 'BDL';`
+    - `SELECT dest, sum(1) as N FROM flights GROUP BY dest HAVING dest = 'BDL';`
+
+## Aggregate Functions
+
+- `COUNT`, `SUM`, `MIN`, `MAX`, `AVG`
+- `array_agg`, `DISTINCT`
+- [More](http://www.postgresql.org/docs/9.4/static/functions-aggregate.html)
+
+## Window Functions
+
+- [Compute per row values that may depend on the full result set](http://www.postgresql.org/docs/9.4/static/tutorial-window.html)
+- e.g. [`rank`](http://www.postgresql.org/docs/9.4/static/functions-window.html)
+
+# Activity
+
+```{r, echo=FALSE, message=FALSE} 
+require(knitr)
+opts_chunk$set(echo = FALSE, eval=FALSE)
+```
+
+```{r connect}
+require(RPostgreSQL)
+con <- dbConnect(PostgreSQL(), host="localhost", user="postgres", password="postgres", dbname="imdb")
+```
+
+## Questions
+
+Use the `imdb` database to answer the following questions. 
+
+#. Count the number of movies in each production year. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT production_year, count(title) as numMovies FROM movies GROUP BY production_year")
+```
+
+11. Find the total number of votes cast for movies in each year since 2000.
+
+```{r q11}
+dbGetQuery(con, statement = "SELECT production_year, sum(votes) AS numVotes FROM movies WHERE production_year >= 2000 GROUP BY production_year")
+```
+
+12. What is wrong with this SQL statement, and how can we correct it?
+
+```
+SELECT production_year, sum(votes) 
+  FROM movies 
+  GROUP BY production_year 
+  HAVING votes > 100000
+```
+
+<!--
+> The problem is that the HAVING clause operates on the number of votes for an individual movie, but there is no column called "votes" in the result set. 
+
+> We can correct this in two different ways, depending on what we want. If we want to include only individual movies with at least 100,000 votes, then we should change the "HAVING" clause to a "WHERE" clause. If, on the other hand, we want production years with at least 100,000 total votes, then we should specify "HAVING sum(votes) > 100000" instead. 
+-->
+
+
+#. What is wrong with this statement, and how can we correct it?
+
+```
+SELECT production_year, sum(votes) 
+  FROM movies 
+  GROUP BY votes 
+  HAVING votes > 100000
+```
+
+<!--
+> Here, we are grouping by the number of votes, but that column is not SELECTed in the result set. 
+
+> It's less clear what the intention was here, but we can correct it using either of the two methods mentioned above. 
+-->
+
+#. Compute the average rating of movies in 2000 and 2010. 
+
+```{r q14}
+dbGetQuery(con, statement = "SELECT production_year, avg(rating) FROM movies WHERE production_year IN (2000, 2010) GROUP BY production_year")
+```
+
+
+1. Find the movie id for [*The Dark Knight*](http://www.imdb.com/title/tt0468569/).
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE title = 'The Dark Knight'")
+```
+
+2. Using the `id` you found in the previous question, find all of the cast assignments for *The Dark Knight*.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM cast_info WHERE movie_id = 2444926")
+```
+
+3. Add the names of the people you found in the previous question by joining onto the `people` table.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM cast_info ci JOIN people p ON ci.person_id = p.id WHERE movie_id = 2444926")
+```
+
+4. Add the names of the roles you found in the previous question by joining onto the `role_type` table.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM cast_info ci JOIN people p ON ci.person_id = p.id JOIN role_type r ON r.id = ci.role_id WHERE movie_id = 2444926")
+```
+
+5. How many actors, actresses, and directors where there for *The Dark Knight*? Find all three numbers using one query.
+
+```{r}
+dbGetQuery(con, statement = "SELECT role, count(distinct person_id) FROM cast_info ci JOIN people p ON ci.person_id = p.id JOIN role_type r ON r.id = ci.role_id WHERE movie_id = 2444926 GROUP BY r.id")
+```
+
+6. Identify the five actors who played more than one role in *The Dark Knight*, and list the roles?
+
+```{r}
+dbGetQuery(con, statement = "SELECT ci.person_id, p.name, count(ci.id) as numRoles FROM cast_info ci JOIN people p ON ci.person_id = p.id JOIN role_type r ON r.id = ci.role_id WHERE movie_id = 2444926 GROUP BY ci.person_id, p.name HAVING count(ci.id) > 1")
+```
+
+7. The *Godfather* trilogy consists of three movies: *The Godfather*, *The Godfather: Part II*, and *The Godfather: Part III*. Find the IDs of all three movies. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE title LIKE '%Godfather%'")
+```
+
+8. List the movie title, person name, and role for all those involved with the original *The Godfather* movie. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT p.name, r.role FROM cast_info ci JOIN people p ON p.id = ci.person_id 
+  JOIN role_type r ON r.id = ci.role_id WHERE ci.movie_id = 2458086")
+```
+
+9. List the movie title, person name, and role for all those involved with the **first two** *Godfather* movies. 
+
+> Hint: One way to do this is with [INTERSECT](http://www.postgresql.org/docs/9.4/static/queries-union.html). There are other ways!
+
+```{r}
+dbGetQuery(con, statement = "(SELECT p.name, r.role FROM cast_info ci JOIN people p ON p.id = ci.person_id 
+  JOIN role_type r ON r.id = ci.role_id WHERE ci.movie_id = 2458086)
+INTERSECT
+(SELECT p.name, r.role FROM cast_info ci JOIN people p ON p.id = ci.person_id 
+  JOIN role_type r ON r.id = ci.role_id WHERE ci.movie_id = 2458108)")
+```
+
+
+#. List the movie title, person name, and role for all those involved with the **all three** *Godfather* movies. 
+
+> Challenge: Do this without using INTERSECT!
+
+```{r}
+dbGetQuery(con, statement = "SELECT max(p.name), array_agg(distinct r.role), count(distinct ci.movie_id) as numMovies
+  FROM cast_info ci JOIN people p ON p.id = ci.person_id 
+  JOIN role_type r ON r.id = ci.role_id 
+  WHERE ci.movie_id IN (SELECT id FROM movies WHERE title LIKE '%Godfather%')
+  GROUP BY p.id
+  HAVING count(distinct ci.movie_id) = 3")
+```
+
+#. List all the movies that Al Pacino and Robert De Niro have been in **together**.
+
+```{r}
+dbGetQuery(con, statement = "SELECT m.title, count(distinct ci.person_id) FROM cast_info ci 
+  JOIN movies m ON m.id = ci.movie_id
+WHERE ci.person_id IN 
+(SELECT id FROM people WHERE name LIKE '%Pacino%' OR name LIKE '%De Niro, Robert%')
+GROUP BY m.id
+HAVING count(distinct ci.person_id) > 1")
+```
+
+

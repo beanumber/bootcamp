@@ -1,0 +1,75 @@
+---
+title: "Joining Multiple Tables"
+---
+
+# Join types
+
+## `JOIN`
+
+- [match all rows](http://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-FROM) from the first table *only if* there is a match on the second table
+
+## `LEFT JOIN`
+
+- match all rows from the first table *regardless* of whether there is a match on the second table
+- `RIGHT JOIN`: opposite of `LEFT JOIN`
+
+## `OUTER JOIN`
+
+- match all rows from *both* tables regardless of whether there is a match on the other table
+
+## `CROSS JOIN`
+
+- all possible pairs from the two tables
+- e.g. finding all possible edges in a graph:
+    - `CROSS JOIN` the edge list with itself
+
+## Subqueries
+
+- [Join a table of results from another query](http://www.postgresql.org/docs/9.4/static/functions-subquery.html)
+
+# Activity
+
+```{r, echo=FALSE, message=FALSE} 
+require(knitr)
+opts_chunk$set(echo = FALSE, eval=FALSE)
+```
+
+```{r connect}
+require(RPostgreSQL)
+con <- dbConnect(PostgreSQL(), host="localhost", user="postgres", password="postgres", dbname="airlines")
+```
+
+## Questions
+
+Use the `airlines` database to answer the following questions. 
+
+#. Find the names of all of the carriers that left Bradley International Airport on June 15th, 2013. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT c.* FROM flights f JOIN carriers c ON f.carrier = c.carrier WHERE month = 6 and day = 15 and origin = 'BDL';")
+```
+
+#. Find all the carriers that fly out of Bradley International Airport and list them by number of flights. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT carrier, sum(1) as N FROM flights WHERE origin = 'BDL' GROUP BY carrier ORDER BY N desc;")
+```
+
+
+#. Find all the **names** of all of the carriers that fly out of Bradley International Airport and list them by number of flights. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT f.carrier, max(c.name) as Airline, sum(1) as N FROM flights f LEFT JOIN carriers c ON f.carrier = c.carrier WHERE origin = 'BDL' GROUP BY f.carrier ORDER BY N desc;")
+```
+
+#. What model of plane is most common at Bradley?
+
+```{r}
+dbGetQuery(con, statement = "SELECT manufacturer, model, sum(1) as N FROM flights f LEFT JOIN planes p ON f.tailnum = p.tailnum WHERE origin = 'BDL' GROUP BY manufacturer, model ORDER BY N desc;")
+```
+
+#. What model of plane is most common at Bradley? This time group the model numbers before the `-`.
+
+```{r}
+dbGetQuery(con, statement = "SELECT manufacturer, split_part(model, '-', 1) as myModel, sum(1) as N FROM flights f LEFT JOIN planes p ON f.tailnum = p.tailnum WHERE origin = 'BDL' GROUP BY manufacturer, myModel ORDER BY N desc;")
+```

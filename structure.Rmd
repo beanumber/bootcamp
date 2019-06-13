@@ -1,0 +1,94 @@
+---
+title: "Table Structure"
+---
+
+# Optimization
+
+## Table Structure
+
+- longer, narrower tables are generally better than wide, short tables
+- tradeoff between query speed and index size
+- NULLs
+- [3NF](http://en.wikipedia.org/wiki/Third_normal_form)
+    - Idea: don't duplicate data, use keys and more tables; keep like with like
+
+## Keys & Indices
+
+- PRIMARY: every row should have a *unique* identifier
+    - a table may have only one PRIMARY key
+    - generally bad practice not to have a PRIMARY KEY
+- [INDEX]() (see below)
+- UNIQUE: unlike PRIMARY, can have NULLs
+- search may be $O(\log{n})$ instead of $O(n)$
+- Optimizing queries with [EXPLAIN](http://www.postgresql.org/docs/9.4/static/sql-explain.html)
+
+## Foreign Keys
+
+- [Referential Integrity](https://en.wikipedia.org/wiki/Referential_integrity):
+    - every value in a FOREIGN KEY must correspond to an entry in another table's PRIMARY KEY
+    - unidirectional
+    - one-to-one, one-to-many
+- [Entity Relationship Schema](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model)
+
+
+## Partitioning
+
+- [Inheritance](http://www.postgresql.org/docs/9.4/static/ddl-inherit.html)
+- split the data into separate [logical blocks](http://www.postgresql.org/docs/9.4/static/ddl-partitioning.html)
+
+## Housekeeping
+
+- [`VACUUM ANALYZE`](http://www.postgresql.org/docs/9.4/static/sql-vacuum.html)
+
+## Example
+```{psql, eval=FALSE}
+DROP INDEX IF EXISTS individuals_state_idx;
+DROP INDEX IF EXISTS committees_cmte_st_idx;
+
+-- wicked slow, running time forever...
+-- note sequential scans
+EXPLAIN SELECT sum(1) as N FROM committees c
+JOIN individuals i ON c.cmte_st = i.state
+WHERE i.state = 'MA';
+
+-- Build index on big table
+CREATE INDEX ON individuals (state);
+
+-- now it uses the index, running time 
+EXPLAIN SELECT sum(1) as N FROM committees c
+JOIN individuals i ON c.cmte_st = i.state
+WHERE i.state = 'MA';
+
+-- Build index on small table
+CREATE INDEX ON committees (cmte_st);
+
+-- now it uses BOTH indexes, running time 
+EXPLAIN SELECT sum(1) as N FROM committees c
+JOIN individuals i ON c.cmte_st = i.state
+WHERE i.state = 'MA';
+```
+
+# Activity
+
+```{r, echo=FALSE, message=FALSE} 
+require(knitr)
+opts_chunk$set(echo = FALSE, eval=FALSE)
+```
+
+```{r connect}
+require(RPostgreSQL)
+con <- dbConnect(PostgreSQL(), host="localhost", user="postgres", password="postgres", dbname="airlines")
+```
+
+## Questions
+
+1. An entity relationship schema shows how _____are related to each other in a database.
+2. A primary key ____-ly identifies an observation in a ____.
+3. A primary key in one table can be a foreign key in another table. Can the foreign key
+alone uniquely describe a row of data in a table?
+3. What's the purpose of primary keys and foreign keys?
+4. Can primary keys have repeat values in a table?
+5. Can foreign keys have repeat values in a table?
+6. Are primary and foreign keys related only through one-to-one
+relationships?
+

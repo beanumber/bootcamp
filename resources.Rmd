@@ -1,0 +1,31 @@
+---
+title: 'Resources'
+---
+
+
+# Using SQL
+
++ Download and install [PostgreSQL](http://www.postgresql.com/download)
++ Download and install the [pgAdmin](http://www.pgadmin.org/download/). This is the most widely-used GUI for working with PostgresQL. It is free, open-source, and cross-platform. 
++ The command line program [psql](http://www.postgresql.org/docs/9.4/static/app-psql.html) should be installed, but you might need to configure your `$PATH` variable in order to find it. 
++ `dplyr` provides a syntax for pulling PostgreSQL data directly into R, but relies upon the [`RPostgreSQL` package](http://cran.r-project.org/web/packages/RPostgreSQL/index.html) to do so. This package is cross-platform, but is not always available as a binary. 
++ Installing `RPostgreSQL`:
+    ```{r, eval=FALSE}
+    install.packages("RPostgreSQL")
+    ```
+    If that doesn't work, try:
+    
+    ```{r, eval=FALSE}
+    install.packages("RPostgreSQL", type="source")
+    ```
++ Read the [PostgreSQL Documentation](http://www.postgresql.org/docs/9.4/interactive/index.html)!
+
+# Books
+
+- [SQL in a Nutshell](http://www.amazon.com/SQL-Nutshell-OReilly-Kevin-Kline/dp/0596518846/ref=sr_1_1?s=books&ie=UTF8&qid=1433865473&sr=1-1&keywords=sql+in+a+nutshell)
+
+# `etl` packages
+
++ [`etl`](http://www.github.com/beanumber/etl)
++ [`airlines`](http://www.github.com/beanumber/airlines)
++ [`fec`](http://www.github.com/beanumber/fec)

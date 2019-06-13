@@ -1,0 +1,34 @@
+---
+title: "Using PostgreSQL"
+---
+
+## Installation
+
+- Download and install PostgreSQL 
+    (http://www.postgresql.com/download)
+- Download and install pgAdmin 
+    (http://www.pgadmin.org/download/)
+- Probably want the command line program [psql](http://www.postgresql.org/docs/9.4/static/app-psql.html)
+- Questions? Read [Documentation](http://www.postgresql.org/docs/9.4/interactive/index.html)!
+
+## Setup
+
+- `sudo -u postgres psql`
+- You might want to set up a user account for yourself
+- The default user is `postgres`
+- Helpful Links:
+    - (https://wiki.postgresql.org/wiki/First_steps)
+    - (http://www.postgresql.org/message-id/4D958A35.8030501@hogranch.com)
+- Connect using `pgAdmin`
+
+## Loading new data
+
+- Create a new database called `imdb`
+- Right-click on `imdb`, select `Restore...`
+- Find `imdb.backup`
+- Should now have four `table`s in the `public` `schema`
+    - `cast_info`
+    - `movies`
+    - `people`
+    - `role_type`
+- aside: [`DATABASE` vs. `SCHEMA`](https://en.wikipedia.org/wiki/Comparison_of_relational_database_management_systems#Databases_vs_schemas_.28terminology.29)

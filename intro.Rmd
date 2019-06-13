@@ -1,0 +1,49 @@
+---
+title: "Introduction to SQL"
+---
+
+## What is SQL?
+
+- [SQL](http://en.wikipedia.org/wiki/SQL) = Structured Query Language
+- used to query Relational Database Management Systems (RDBMS)
+- based on *relational algebra* and *tuple relational calculus*
+- world's most widely used database language
+
+## Reference
+
+[![SQL in a Nutshell](https://images-na.ssl-images-amazon.com/images/I/41yJ%2BbL2PNL._SX337_BO1,204,203,200_.jpg)](http://www.amazon.com/SQL-Nutshell-OReilly-Kevin-Kline/dp/0596518846/ref=sr_1_1?s=books&ie=UTF8&qid=1433865473&sr=1-1&keywords=sql+in+a+nutshell)
+
+## Flavors & Standards
+
+- ANSI standard since 1986...
+- ...but that is not perfectly followed
+- Converting databases from one implementation to another is not trivial
+- Major implementations:
+    - Oracle
+    - Microsoft SQL Server
+    - [SQLite](http://en.wikipedia.org/wiki/SQLite) 
+        - lightweight, embedded
+    - [MySQL](http://en.wikipedia.org/wiki/MySQL)
+        - most popular client-server RDBMS
+        - open source, but now owned by Oracle
+        - [MariaDB](http://en.wikipedia.org/wiki/MariaDB) is community fork
+        - Facebook, Google, LinkedIn and Twitter
+    - [PostgreSQL](http://en.wikipedia.org/wiki/PostgreSQL)
+        - open source, feature-rich, standards compliant
+        - Reddit, Instagram
+        
+## Hierarchical Data Structure
+
+- Databases/Schemas contain tables
+    - aside: `DATABASE` vs. `SCHEMA`
+    - `psql=# \l` 
+    - `psql=# \dn` 
+- Tables (rectangular arrays of data)
+    - `psql=# \dt` 
+    - columns (aka fields, variables, $p$)
+    - rows (aka records, cases, observations, $n$)
+- Fields 
+    - `psql=# \d tablename` 
+    - must have a specified data type
+    - want to choose most appropriate/efficient data type for your data!
+    

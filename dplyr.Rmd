@@ -1,0 +1,91 @@
+---
+title: "dplyr and SQL"
+---
+
+A `data.frame`
+
+```{r}
+library(tidyverse)
+head(mtcars)
+dim(mtcars)
+class(mtcars)
+```
+
+Make a SQLite database
+
+```{r, message=FALSE}
+db <- src_sqlite(":memory:", create = TRUE)
+mtcars2 <- mtcars %>%
+  tibble::rownames_to_column(var = "model") %>%
+  copy_to(dest = db, df = .)
+dim(mtcars2)
+head(mtcars2)
+class(mtcars2)
+```
+
+Get some results
+
+```{r}
+# works
+mtcars %>%
+  group_by(cyl) %>%
+  summarize(N = n(), avg_mpg = mean(mpg), 
+            broken = paste(mean(mpg), mean(disp), sep = "-"))
+
+# breaks
+mtcars2 %>%
+  group_by(cyl) %>%
+  summarize(N = n(), avg_mpg = mean(mpg), 
+            broken = paste(mean(mpg), mean(disp), sep = "-")) %>%
+  show_query()
+
+mtcars3 <- mtcars2 %>% 
+  collect()
+```
+
+
+```{r, error=TRUE}
+# works, but why???
+mtcars2 %>%
+  group_by(cyl) %>%
+  summarize(N = n(), avg_mpg = mean(mpg), 
+            broken = avg(mpg) %||% "-" %||% mean(disp)) %>%
+  show_query()
+```
+
+## Connect to PostgreSQL
+
+```{r}
+library(tidyverse)
+db <- src_postgres(dbname = "postgres", host = "localhost", port = 5432, user = "postgres", password = "postgres")
+class(db)
+str(db)
+```
+
+Connect to a real database
+
+```{r}
+library(tidyverse)
+db <- src_postgres(dbname = "imdb", host = "localhost", port = 5432, user = "postgres", password = "postgres")
+src_tbls(db)
+movies <- tbl(db, "movies")
+movies
+```
+
+Compare memory footprints
+
+```{r}
+print(object.size(movies), units = "Kb")
+print(object.size(movies %>% collect()), units = "Kb")
+```
+
+```{r}
+DBI::dbGetQuery(db$con, "SELECT people.name, 
+           COUNT(DISTINCT movies.title) as num_films 
+           FROM movies 
+           JOIN cast_info ON movies.id = cast_info.movie_id 
+           JOIN people ON people.id = cast_info.person_id 
+           GROUP BY people.id 
+           ORDER BY num_films desc 
+           LIMIT 10;")
+```

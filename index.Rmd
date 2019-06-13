@@ -1,0 +1,50 @@
+---
+title: "Schedule"
+---
+
+# Day Zero
+
+- bash
+- git
+
+# Day One
+
+- Introduction and Overview
+    - `dplyr` -> `SQL`
+    - A brief history of SQL
+    - Getting Started with PostgreSQL
+- Writing Queries
+    - `SELECT...FROM`
+    - `AS`
+    - `WHERE`
+    - `ORDER BY`
+    - `LIMIT`
+- Joining Two Tables
+    - `JOIN`
+    - `LEFT JOIN`, `RIGHT JOIN`
+    - `OUTER JOIN`
+    - `CROSS JOIN`
+    - Subqueries
+- Aggregating Results
+    - `GROUP BY`
+    - `HAVING`
+
+# Day Two
+
+- Table Structure
+    - Keys
+    - Foreign Keys
+    - Indices
+    - Partitioning
+- Creating tables
+    - Data Definition scripts
+    - Column data types
+    - `LOAD DATA`
+    - Command line tools
+    - Backup and Restore
+- Views, Stored Procedures, Triggers
+    
+# Day Three & Four
+
+- SQL Challenge
+

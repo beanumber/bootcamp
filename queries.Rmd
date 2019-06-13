@@ -1,0 +1,136 @@
+---
+title: "Writing Queries"
+---
+
+
+```{r, echo=FALSE, message=FALSE} 
+require(knitr)
+opts_chunk$set(echo = FALSE, eval=FALSE)
+```
+
+```{r connect}
+require(RPostgreSQL)
+con <- dbConnect(PostgreSQL(), host="localhost", user="postgres", password="postgres", dbname="imdb")
+```
+
+# Query syntax
+
+## `SELECT...FROM`
+
+- [What table and which columns](http://www.postgresql.org/docs/9.4/static/queries.html)
+
+## `AS`
+  
+- [column labels](http://www.postgresql.org/docs/9.4/static/queries-select-lists.html#QUERIES-COLUMN-LABELS) for the result set  
+  
+## `WHERE`
+
+- [String Functions](http://www.postgresql.org/docs/9.4/static/functions-string.html)
+- [Ranges](http://www.postgresql.org/docs/9.4/static/functions-range.html)
+- [Dates](http://www.postgresql.org/docs/9.4/static/functions-datetime.html)
+- [`IN`](http://www.postgresql.org/docs/9.4/static/functions-comparisons.html)
+- [Regular Expressions](http://www.postgresql.org/docs/9.4/static/functions-matching.html)
+
+## `ORDER BY`
+
+- [sort the results](http://www.postgresql.org/docs/9.4/static/queries-order.html)
+   
+## `LIMIT`
+
+- [`LIMIT`](http://www.postgresql.org/docs/9.4/static/queries-limit.html): Restrict number of rows returned
+- `OFFSET`: don't necessarily start at the beginning
+
+# Set Operations
+
+- [Combining Queries](http://www.postgresql.org/docs/9.4/static/queries-union.html)
+
+# Activity
+
+## Instructions
+
+In this assignment, you will query a database of movies, actors/actresses, and directors. These data is a subset of the [Internet Movie Database](http://www.imdb.com) and is used in compliance with their [terms and conditions](http://www.imdb.com/conditions). 
+
+To load this database into PostgreSQL:
+
+#. Create a new database in `pgAdmin` by clicking on `Databases` in the left pane, and then selecting `Edit -> New Object -> New Database...` from the top menu. Name the new database `imdb`. 
+#. You should now see `imdb` in the list of databases in the left pane of pgAdmin. Click on it, and then select `Tools -> Restore...` from the top menu. Find the file `imdb.backup` and restore it. 
+
+You should now have four tables in the the `imdb` database: `cast_info`, `movies`, `people`, and `role_type`. 
+
+* The `movies` table contains information about some 1600 Hollywood movies. All feature-length movies up until late 2013 with at least 50,000 ratings on IMDB.com are included. The title, production year, rating, and number of votes are included in this table. 
+
+* The `people` table contains information about all of the actors, actresses and directors that appeared in the movies in the `movies` table. The names and gender of these people are included. 
+
+* The `role_type` table is a small lookup table that relates `role_id`s to `role`s. This subset of the IMDB database contains only actors, actresses, and directors. 
+
+* The `cast_info` table is a lookup table that relates people to the roles they played in certain movies. Each row in the `cast_info` table is an assignment of one person to one role in one movie. Obviously, a single person can play multiple roles in a single movie, or perform in many movies. 
+
+## Questions
+
+Use the `imdb` database to answer the following questions. 
+
+1.  List the titles of all of the movies (`movies` table).
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies")
+```
+
+2. List the titles of all movies produced in 2012.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE production_year = 2012")
+```
+
+3. List the titles and ratings of all movies produced in 2012, and sort them in descending order by rating.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE production_year = 2012 ORDER BY rating desc")
+```
+
+4. List the titles of all movies produced in either 1992 or 2012.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE production_year IN (1992, 2012)")
+```
+
+5. List the titles and ratings of all movies with ratings between 8.1 and 8.3. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE rating >= 8.1 AND rating <= 8.3")
+```
+
+6. Using table `people`, list all those whose names contain 'ford'.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM people WHERE name LIKE '%ford%'")
+```
+
+7. Get the distinct role types of roles in the `cast_info` table.
+
+```{r}
+dbGetQuery(con, statement = "SELECT distinct role_id FROM cast_info")
+```
+
+8. List of the movies with at least 500,000 votes. 
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies WHERE votes >= 500000")
+```
+
+9. Find the movie with the best overall rating.
+
+```{r}
+dbGetQuery(con, statement = "SELECT * FROM movies ORDER BY rating desc LIMIT 1")
+```
+
+17. Write a REGEX statement to find any name in table `people` with "ford," where "ford" can be upper or lower case.
+
+```{r q17}
+dbGetQuery(con, statement = "SELECT name FROM people WHERE name ~* 'ford'")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+c = dbGetQuery(con, statement = "SELECT * FROM people")
+c[grep('ford', c$name, ignore.case=TRUE), "name"]
+```
+

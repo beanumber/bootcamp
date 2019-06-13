@@ -1,0 +1,376 @@
+---
+title: "SQL Bootcamp"
+subtitle: "short course"
+author: "Ben Baumer"
+date: "June 17, 2019</br>"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      beforeInit: "include/macros.js"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.path = 'figures/', fig.height = 5)
+library(tidyverse)
+```
+
+class: center, middle
+# SQL
+
+---
+## A brief primer on SQL 
+
+.pull-left[
+
+![](http://www.freeiconspng.com/uploads/sql-file-icon-0.png)
+
+]
+
+.pull-right[
+
+- SQL is not just one thing
+    - MySQL, PostgreSQL, SQLite
+    - Oracle, Big Query, Vertica
+
+- Theory developed in 1970s (E.F. Codd)
+
+- Ingres implemented mid-1970s
+
+- robust, time-tested, well understood
+
+]
+
+---
+## We'll be using PostgreSQL
+
+.pull-left[ 
+
+![](https://www.postgresql.org/media/img/about/press/slonik_with_black_text_and_tagline.gif)
+
+]
+
+.pull-right[
+
+- Arguably the most "advanced" RDBMS
+
+- See also: MySQL, SQLite
+
+- Big Data SQL variants: 
+    - Vertica, Google BigQuery, Apache Spark
+
+]
+
+---
+## The thing about SQL is...
+
+
+--
+
+.pull-left[
+
+Since you already know 
+
+.centered[![](http://hexb.in/hexagons/dplyr.png)]
+
+]
+
+--
+
+.pull-right[
+
+You **already** know SQL!
+
+![](https://cdn1.vectorstock.com/i/1000x1000/77/30/sql-database-icon-logo-design-ui-or-ux-app-vector-17507730.jpg)
+
+]
+
+---
+## Same concepts, different syntax
+
+.pull-left[
+
+dplyr
+```{r, eval=FALSE}
+table %>%
+  filter(field == "value") %>%
+  left_join(lkup, 
+    by = c("lkup_id" = "id") %>%
+  group_by(year) %>%
+  summarize(N = sum(1)) %>%
+  filter(N > 100) %>%
+  arrange(desc(N)) %>%
+  head(10)
+
+```
+]
+
+.pull-right[
+
+MySQL
+```{sql, eval=FALSE}
+SELECT
+  year, sum(1) as N
+FROM table t
+LEFT JOIN lkup l
+  ON t.lkup_id = l.id
+WHERE field = "value"
+GROUP BY year
+HAVING N > 100
+ORDER BY N desc
+LIMIT 0, 10;
+```
+]
+
+--
+
+- You may have learned `dplyr` first, but...
+    - SQL came first
+    - and it's more widely-used
+
+---
+## Why `dplyr` vs. SQL?
+
+.pull-left[
+
+R + `dplyr` good at:
+
+- fitting models
+
+- plotting
+
+- wrangling data of all kinds
+
+- working with small data
+
+- being an *interface to SQL*
+
+]
+
+.pull-right[
+
+SQL good at:
+
+- storage and retrieval
+
+- medium-to-big data
+
+- multi-user, asynchronous access
+
+- serving institutional needs
+
+- web/mobile apps
+
+]
+
+---
+
+
+# Connecting dplyr to SQL
+
+---
+## `dplyr` + SQL connection
+
+- `dplyr` can access a SQL database directly
+
+- Instead of `tbl_df`, you have a `tbl_sql`
+
+- Data is stored and processed in SQL
+    - Tiny memory footprint in R
+
+- **Lazy evaluation**
+    - server-side processing
+    - `dplyr` to SQL translation via `show_query()`
+
+- See [`dbplyr` package](https://github.com/tidyverse/dbplyr)
+
+---
+## Example: `tbl_sql`
+
+```{r}
+db <- src_postgres(
+  dbname = "imdb", host = "localhost", 
+  port = 5432, user = "postgres", password = "postgres"
+)
+movies <- tbl(db, "movies")
+class(movies)
+print(object.size(movies), units = "Kb")
+```
+
+---
+## `tbl_sql` works just like a `tbl_df`
+
+```{r}
+movies
+```
+
+---
+## Example: `show_query()`
+
+```{r star-wars}
+movies %>%
+  filter(title == 'Star Wars', kind_id == 1) %>%
+  select(production_year, title) %>%
+  show_query()
+```
+
+---
+class: center, middle
+# Common questions
+
+---
+## Do we need pgAdmin?
+
+- Short answer: No
+
+- Long answer: I find it helpful for:
+    - exploring databases with a GUI
+    - fiddling around with queries
+    - more informative error messages
+    - built-in help
+    - adding keys and indexes (more on that later)
+    - then copy-and-paste working queries into R Markdown
+
+---
+## Ways to interact with PostgreSQL
+
+1. GUI SQL client: pgAdmin
+
+2. command line SQL client (next slide)
+
+3. generic SQL access in R: ~~`DBI::dbGetQuery()`~~
+
+4. `RPostgreSQL` through R Markdown chunks (see labs & hw)
+
+5. Lots of other ways...
+
+--
+
+I prefer:
+
+- (1) for SQL development
+
+- (4) for SQL reporting
+
+---
+## What's the deal with table aliases?
+
+Consider:
+
+
+```{sql, eval=FALSE}
+SELECT title.title, 
+  company_name.name, 
+  title.production_year
+FROM movie_companies 
+  JOIN company_name 
+    ON movie_companies.company_id = company_name.id
+  JOIN title 
+    ON title.id = movie_companies.movie_id
+WHERE company_name.name LIKE '%All Rise Films%'
+  AND title.kind_id = 1
+  AND movie_companies.company_type_id = 2;
+```
+
+---
+## What's the deal with table aliases?
+
+Instead:
+
+```{sql, eval=FALSE}
+SELECT t.title, 
+  cn.name, 
+  t.production_year
+FROM movie_companies AS mc 
+  JOIN company_name AS cn
+    ON mc.company_id = cn.id
+  JOIN title AS t
+    ON t.id = mc.movie_id
+WHERE cn.name LIKE '%All Rise Films%'
+  AND t.kind_id = 1
+  AND mc.company_type_id = 2;
+```
+
+---
+## People in the IMDB
+
+- `name`: people and their names
+    - `id` column is primary key
+
+- `person_id` column references `name.id` from:
+    - `person_info`
+    - `cast_info`
+    - `aka_name`
+
+---
+## Movies in the IMDB
+
+- `title`: movies and their titles
+    - `id` column is primary key
+
+- `movie_id` column references `title.id` from:
+    - `cast_info`
+    - `aka_title`
+    - `movie_companies`
+    - `movie_info`
+    - `movie_info_idx`
+    - `movie_keyword`
+    - `movie_link`
+
+---
+background-image: url(https://i.imgur.com/pDq0n.png)
+background-size: contain
+
+---
+class: center, middle
+# Keys and Indexes
+
+---
+background-image: url(http://static.libsyn.com/p/assets/c/2/1/b/c21be1062e52949b/Unused-Indexes-vs-Foreign-Keys.png)
+background-size: contain
+---
+## Keys and Indexes
+
+- Keys:
+    - `PRIMARY KEY`: unique, non-`NULL`, only one per table
+    - `UNIQUE KEY`: unique, may include `NULL`
+    - `FOREIGN KEY`: references primary key in another table
+
+- Indexes:
+    - No constraints, just about speed
+    - Take up space on disk
+    - Will they be used?
+    
+- A `PRIMARY KEY` is always indexed
+
+---
+background-image: url(https://i.imgur.com/pDq0n.png)
+background-size: contain
+---
+## A DB without indexes is like Dory
+
+.centered[![](https://i.ytimg.com/vi/rKjxJqIQTsE/maxresdefault.jpg)]
+
+---
+## An index is a lookup table
+
+.centered[![](http://ptgmedia.pearsoncmg.com/images/bok_0672324423/elementLinks/16fig01.gif)]
+
+---
+## So why not just build indexes on all the columns?
+
+- Takes up space on disk
+
+- Takes time to build
+
+- Slows down inserts
+
+- Not always that big of an improvement
+
+---
+background-image: url(http://static.libsyn.com/p/assets/c/2/1/b/c21be1062e52949b/Unused-Indexes-vs-Foreign-Keys.png)
+background-size: contain

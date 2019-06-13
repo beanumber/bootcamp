@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Ben Baumer" />
+
+
+<title>Crash course in bash</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="northampton.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Bootcamp</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="bash.html">
+    <span class="fa fa-terminal"></span>
+     
+    bash
+  </a>
+</li>
+<li>
+  <a href="git.html">
+    <span class="fa fa-github"></span>
+     
+    git
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-database"></span>
+     
+    SQL
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dplyr.html">dplyr and SQL</a>
+    </li>
+    <li>
+      <a href="slides/sql_slides.html">Slides</a>
+    </li>
+    <li>
+      <a href="intro.html">Introduction</a>
+    </li>
+    <li>
+      <a href="postgres.html">Getting Started with PostgreSQL</a>
+    </li>
+    <li>
+      <a href="queries.html">Writing Queries</a>
+    </li>
+    <li>
+      <a href="join.html">Joining Two Tables</a>
+    </li>
+    <li>
+      <a href="aggregating.html">Aggregating Results</a>
+    </li>
+    <li>
+      <a href="structure.html">Table Structure</a>
+    </li>
+    <li>
+      <a href="create.html">Creating Tables</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-download"></span>
+     
+    Data
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="https://www.science.smith.edu/~bbaumer/data/imdb.backup">IMDB</a>
+    </li>
+    <li>
+      <a href="https://www.science.smith.edu/~bbaumer/data/lahman.backup">Baseball</a>
+    </li>
+    <li>
+      <a href="https://www.science.smith.edu/~bbaumer/data/airlines.backup">Airlines</a>
+    </li>
+    <li>
+      <a href="https://github.com/beanumber/airlines">Airlines (ETL)</a>
+    </li>
+    <li>
+      <a href="https://github.com/beanumber/fec">FEC (ETL)</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="resources.html">
+    <span class="fa fa-hands-helping"></span>
+     
+    Resources
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/beanumber">
+    <span class="fa fa-github"></span>
+     
+    beanumber
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Crash course in bash</h1>
+<h4 class="author">Ben Baumer</h4>
+<h4 class="date">6/10/2019</h4>
+
+</div>
+
+
+<pre class="r"><code>library(tidyverse)</code></pre>
+<div id="what-is-unix" class="section level1">
+<h1>What is UNIX?</h1>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Single_UNIX_Specification">Single UNIX specification</a></li>
+<li><a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Unix_shell">Unix shell</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">bash</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Unix_philosophy">UNIX philosophy</a></li>
+</ul>
+</div>
+<div id="navigating-the-file-system" class="section level1">
+<h1>Navigating the file system</h1>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Unix_filesystem">Unix filesystem</a></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">Filesystem Hierarchy Standard</a></p></li>
+<li><p><code>pwd</code>, <code>cd</code>, <code>ls</code>, <code>mkdir</code>, <code>~</code>, <code>cp</code>, <code>rm</code></p></li>
+<li><p>Print working directory</p></li>
+</ul>
+<pre class="bash"><code>pwd</code></pre>
+<pre><code>## /home/bbaumer/Dropbox/git/bootcamp</code></pre>
+<ul>
+<li>Move back one directory</li>
+</ul>
+<pre class="bash"><code>cd ..
+pwd</code></pre>
+<pre><code>## /home/bbaumer/Dropbox/git</code></pre>
+<ul>
+<li>Jump back to <a href="https://en.wikipedia.org/wiki/Home_directory">home directory</a></li>
+</ul>
+<pre class="bash"><code>cd ~
+pwd</code></pre>
+<pre><code>## /home/bbaumer</code></pre>
+<ul>
+<li>List contents of directory</li>
+</ul>
+<pre class="bash"><code>ls
+ls -l
+ls -a
+ls -alhS</code></pre>
+<pre><code>## aggregating.html
+## aggregating.Rmd
+## bash.Rmd
+## bootcamp.Rproj
+## create.Rmd
+## data-raw
+## docs
+## dplyr.Rmd
+## git.Rmd
+## include
+## index.Rmd
+## intro.Rmd
+## join.Rmd
+## makefile
+## my_path.txt
+## postgres.Rmd
+## queries.Rmd
+## README.md
+## resources.Rmd
+## site_libs
+## _site.yml
+## slides
+## structure.Rmd
+## total 208
+## -rw-rw-r-- 1 bbaumer bbaumer 15922 Jun 13 11:41 aggregating.html
+## -rw-rw-r-- 1 bbaumer bbaumer  6662 Jun 13 10:24 aggregating.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer  4296 Jun 13 10:00 bash.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer   204 Jun 13 10:46 bootcamp.Rproj
+## -rw-rw-r-- 1 bbaumer bbaumer   622 Jun 14  2017 create.Rmd
+## drwxrwxr-x 3 bbaumer bbaumer  4096 Jun 14  2017 data-raw
+## drwxrwxr-x 5 bbaumer bbaumer  4096 Jun 13 11:41 docs
+## -rw-rw-r-- 1 bbaumer bbaumer  1814 Jun 27  2018 dplyr.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer  1400 Jun 13 10:00 git.Rmd
+## drwxrwxr-x 2 bbaumer bbaumer  4096 Jun 13 11:15 include
+## -rw-rw-r-- 1 bbaumer bbaumer   765 Jun 13 10:38 index.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer  1759 Jun 15  2017 intro.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer  2566 Jun 13 10:23 join.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer   326 Jun 13 10:06 makefile
+## -rw-rw-r-- 1 bbaumer bbaumer    99 Jun 13 11:41 my_path.txt
+## -rw-rw-r-- 1 bbaumer bbaumer  1101 Jun 15  2017 postgres.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer  4957 Jun 13 10:21 queries.Rmd
+## -rw-rw-r-- 1 bbaumer bbaumer    88 Jun 12 11:37 README.md
+## -rw-rw-r-- 1 bbaumer bbaumer  1404 Jun 13 10:27 resources.Rmd
+## drwxrwxr-x 9 bbaumer bbaumer  4096 Jun 13 11:41 site_libs
+## -rw-rw-r-- 1 bbaumer bbaumer  1857 Jun 13 11:40 _site.yml
+## drwxrwxr-x 3 bbaumer bbaumer  4096 Jun 13 11:39 slides
+## -rw-rw-r-- 1 bbaumer bbaumer  2896 Jun 13 10:25 structure.Rmd
+## .
+## ..
+## aggregating.html
+## aggregating.Rmd
+## bash.Rmd
+## bootcamp.Rproj
+## create.Rmd
+## data-raw
+## docs
+## dplyr.Rmd
+## .git
+## .gitignore
+## git.Rmd
+## include
+## index.Rmd
+## intro.Rmd
+## join.Rmd
+## makefile
+## my_path.txt
+## postgres.Rmd
+## queries.Rmd
+## README.md
+## resources.Rmd
+## .Rhistory
+## .Rproj.user
+## site_libs
+## _site.yml
+## slides
+## structure.Rmd
+## total 252K
+## -rw-rw-r--  1 bbaumer bbaumer  16K Jun 13 11:41 aggregating.html
+## -rw-rw-r--  1 bbaumer bbaumer 6.6K Jun 13 10:24 aggregating.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 4.9K Jun 13 10:21 queries.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 4.2K Jun 13 10:00 bash.Rmd
+## drwxrwxr-x  9 bbaumer bbaumer 4.0K Jun 13 11:41 .
+## drwxrwxr-x 84 bbaumer bbaumer 4.0K Jun 13 10:46 ..
+## drwxrwxr-x  3 bbaumer bbaumer 4.0K Jun 14  2017 data-raw
+## drwxrwxr-x  5 bbaumer bbaumer 4.0K Jun 13 11:41 docs
+## drwxrwxr-x  8 bbaumer bbaumer 4.0K Jun 13 11:41 .git
+## drwxrwxr-x  2 bbaumer bbaumer 4.0K Jun 13 11:15 include
+## drwxrwxr-x  4 bbaumer bbaumer 4.0K Jun 10 15:22 .Rproj.user
+## drwxrwxr-x  9 bbaumer bbaumer 4.0K Jun 13 11:41 site_libs
+## drwxrwxr-x  3 bbaumer bbaumer 4.0K Jun 13 11:39 slides
+## -rw-rw-r--  1 bbaumer bbaumer 2.9K Jun 13 10:25 structure.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 2.6K Jun 13 10:23 join.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 1.9K Jun 13 11:40 _site.yml
+## -rw-rw-r--  1 bbaumer bbaumer 1.8K Jun 27  2018 dplyr.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 1.8K Jun 15  2017 intro.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 1.4K Jun 13 10:27 resources.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 1.4K Jun 13 10:00 git.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer 1.1K Jun 15  2017 postgres.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer  765 Jun 13 10:38 index.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer  622 Jun 14  2017 create.Rmd
+## -rw-rw-r--  1 bbaumer bbaumer  581 Jun 10 15:22 .gitignore
+## -rw-rw-r--  1 bbaumer bbaumer  326 Jun 13 10:06 makefile
+## -rw-rw-r--  1 bbaumer bbaumer  204 Jun 13 10:46 bootcamp.Rproj
+## -rw-rw-r--  1 bbaumer bbaumer   99 Jun 13 11:41 my_path.txt
+## -rw-rw-r--  1 bbaumer bbaumer   88 Jun 12 11:37 README.md
+## -rw-rw-r--  1 bbaumer bbaumer    0 Jun 13 10:03 .Rhistory</code></pre>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Symbolic_link">Symbolic links</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">relative vs. absolute paths</a></li>
+</ul>
+<div id="activity" class="section level2">
+<h2>Activity</h2>
+<ol style="list-style-type: decimal">
+<li>Create a directory at the root level of your home directory called <code>stuff</code>.</li>
+<li>Navigate inside <code>stuff</code> and create a directory called <code>tmp2</code>.</li>
+<li><em>Copy</em> the contents of <code>/tmp</code> to <code>~/stuff/tmp2</code>.</li>
+<li>Create a symbolic link to <code>/tmp</code> called <code>ln_tmp</code>.</li>
+<li>Make sure you understand the difference between <code>~/stuff/tmp2</code> and <code>~/stuff/lm_tmp</code>.</li>
+<li>Delete <code>stuff</code>.</li>
+</ol>
+</div>
+</div>
+<div id="whats-happening" class="section level1">
+<h1>What’s happening?</h1>
+<ul>
+<li><code>who</code></li>
+<li><code>top</code>, <code>htop</code></li>
+<li><code>free</code>, <code>df</code></li>
+<li><code>ps</code>, <code>kill</code></li>
+<li><p><code>less</code></p></li>
+<li><p>Who am I?</p></li>
+</ul>
+<pre class="bash"><code>who
+whoami
+w</code></pre>
+<pre><code>## bbaumer  tty7         2019-06-10 15:03 (:0)
+## bbaumer
+##  11:41:24 up 2 days, 20:38,  1 user,  load average: 0.81, 0.96, 1.12
+## USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+## bbaumer  tty7     :0               Mon15    2days 36:28   0.27s /sbin/upstart --user</code></pre>
+<ul>
+<li>How much <a href="https://en.wikipedia.org/wiki/Random-access_memory">memory</a> does this computer have?</li>
+</ul>
+<pre class="bash"><code>free -h</code></pre>
+<pre><code>##               total        used        free      shared  buff/cache   available
+## Mem:            31G        9.1G         16G        516M        6.2G         21G
+## Swap:           31G          0B         31G</code></pre>
+<ul>
+<li>How much <a href="https://en.wikipedia.org/wiki/Hard_disk_drive">disk space</a> does this computer have?</li>
+</ul>
+<pre class="bash"><code>df -h</code></pre>
+<pre><code>## Filesystem      Size  Used Avail Use% Mounted on
+## udev             16G     0   16G   0% /dev
+## tmpfs           3.2G   18M  3.2G   1% /run
+## /dev/sda5       200G   36G  155G  19% /
+## tmpfs            16G  341M   16G   3% /dev/shm
+## tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+## tmpfs            16G     0   16G   0% /sys/fs/cgroup
+## /dev/sdb        1.8T  193G  1.6T  12% /home
+## tmpfs           3.2G  124K  3.2G   1% /run/user/1000</code></pre>
+<ul>
+<li>What is this computer doing right now?</li>
+</ul>
+<pre class="bash"><code>ps aux</code></pre>
+<div id="activity-1" class="section level2">
+<h2>Activity</h2>
+<ol style="list-style-type: decimal">
+<li>Kill a process on your computer (ask me if it’s safe!)</li>
+</ol>
+</div>
+</div>
+<div id="getting-help" class="section level1">
+<h1>Getting help</h1>
+<ul>
+<li><code>man</code></li>
+</ul>
+</div>
+<div id="where-is-it" class="section level1">
+<h1>Where is it?</h1>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Find_(Unix)"><code>find</code></a>, <a href="https://en.wikipedia.org/wiki/Locate_(Unix)"><code>locate</code></a>, <a href="https://en.wikipedia.org/wiki/Which_(command)"><code>which</code></a></li>
+<li><a href="https://en.wikipedia.org/wiki/PATH_(variable)"><code>$PATH</code> variable</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Environment_variable">Environment Variables</a></li>
+<li><a href="https://en.wikipedia.org/wiki/GNU_nano"><code>nano</code></a>, watch out for <a href="https://en.wikipedia.org/wiki/Vi"><code>vi</code></a>!</li>
+</ul>
+<pre class="bash"><code>echo $PATH</code></pre>
+<pre><code>## /home/bbaumer/anaconda3/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin</code></pre>
+<pre class="bash"><code>locate stuff</code></pre>
+<pre><code>## /home/bbaumer/Dropbox/Academic/Smith/courses/mth220/statedcompute-2013/collaborations2013/poster/knitrstuff.tex
+## /home/bbaumer/Dropbox/Academic/Smith/stationery/poster/knitrstuff.tex
+## /home/bbaumer/Dropbox/Academic/modeling_fielding/knitrstuff.tex
+## /home/bbaumer/Dropbox/Academic/modeling_fielding/Poster/knitrstuff.tex
+## /home/bbaumer/Dropbox/Academic/poster-test/knitrstuff.tex
+## /home/bbaumer/Dropbox/WAR/nessis2013/knitrstuff.tex
+## /home/bbaumer/Dropbox/git/sds/to-do/poster/knitrstuff.tex
+## /usr/lib/python3/dist-packages/reportlab/lib/boxstuff.py
+## /usr/lib/python3/dist-packages/reportlab/lib/__pycache__/boxstuff.cpython-35.pyc
+## /usr/share/icons/Humanity/mimes/16/application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/16/gnome-mime-application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/22/application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/22/gnome-mime-application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/24/application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/24/gnome-mime-application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/32/application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/32/gnome-mime-application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/48/application-x-stuffit.svg
+## /usr/share/icons/Humanity/mimes/48/gnome-mime-application-x-stuffit.svg
+## /usr/share/icons/gnome/16x16/mimetypes/gnome-mime-application-x-stuffit.png
+## /usr/share/icons/gnome/22x22/mimetypes/gnome-mime-application-x-stuffit.png
+## /usr/share/icons/gnome/24x24/mimetypes/gnome-mime-application-x-stuffit.png
+## /usr/share/icons/gnome/256x256/mimetypes/gnome-mime-application-x-stuffit.png
+## /usr/share/icons/gnome/32x32/mimetypes/gnome-mime-application-x-stuffit.png
+## /usr/share/icons/gnome/48x48/mimetypes/gnome-mime-application-x-stuffit.png
+## /usr/share/mime/application/x-stuffit.xml</code></pre>
+<pre class="bash"><code>find /usr -name &quot;git&quot;</code></pre>
+<pre><code>## /usr/bin/git
+## /usr/share/lintian/overrides/git
+## /usr/share/bash-completion/completions/git
+## /usr/share/doc/git
+## /usr/lib/git-core/git</code></pre>
+<pre class="bash"><code>which git</code></pre>
+<pre><code>## /usr/bin/git</code></pre>
+<div id="activity-2" class="section level2">
+<h2>Activity</h2>
+<ol style="list-style-type: decimal">
+<li>Find the <code>psql</code> program on your computer</li>
+<li><a href="https://coolestguidesontheplanet.com/add-shell-path-osx/">Amend your <code>$PATH</code> variable</a> to make this program accessible (permanently)</li>
+</ol>
+</div>
+</div>
+<div id="io" class="section level1">
+<h1>I/O</h1>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Grep"><code>grep</code></a>, <a href="https://en.wikipedia.org/wiki/Sed"><code>sed</code></a></li>
+<li><a href="https://en.wikipedia.org/wiki/Standard_streams">Standard input/output</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Redirection_(computing)">Redirection</a>, <code>&gt;</code>, <code>&lt;</code></li>
+<li><a href="https://en.wikipedia.org/wiki/Pipeline_(Unix)">Piping</a> <code>|</code></li>
+<li><a href="https://en.wikipedia.org/wiki/Xargs"><code>xargs</code></a></li>
+</ul>
+<pre class="bash"><code>echo $PATH &gt; my_path.txt
+ls
+wc my_path.txt</code></pre>
+<pre><code>## aggregating.html
+## aggregating.Rmd
+## bash.Rmd
+## bootcamp.Rproj
+## create.Rmd
+## data-raw
+## docs
+## dplyr.Rmd
+## git.Rmd
+## include
+## index.Rmd
+## intro.Rmd
+## join.Rmd
+## makefile
+## my_path.txt
+## postgres.Rmd
+## queries.Rmd
+## README.md
+## resources.Rmd
+## site_libs
+## _site.yml
+## slides
+## structure.Rmd
+##   1   1 147 my_path.txt</code></pre>
+<pre class="bash"><code>echo $PATH | wc</code></pre>
+<pre><code>##       1       1     147</code></pre>
+<div id="beware-of-funky-characters-in-filenames-returned-by-find" class="section level2">
+<h2>Beware of funky characters in filenames returned by <code>find</code></h2>
+<pre class="bash"><code>find ~ -name &quot;*.txt&quot; -mtime -7
+find ~ -name &quot;*.txt&quot; -mtime -7 -print0</code></pre>
+</div>
+<div id="activity-3" class="section level2">
+<h2>Activity</h2>
+<ol style="list-style-type: decimal">
+<li>List all the files in <em>all</em> of the directories in your <code>$PATH</code>.</li>
+</ol>
+<pre class="bash"><code>echo $PATH &gt; my_path.txt
+sed &#39;s/:/\n/g&#39; my_path.txt &gt; my_path.csv
+cat my_path.csv | xargs ls</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Can you do this in one line?</li>
+</ol>
+</div>
+</div>
+<div id="tasks" class="section level1">
+<h1>Tasks</h1>
+<ol style="list-style-type: decimal">
+<li>Copy a bunch of files in nested directories to <code>/tmp</code>.</li>
+</ol>
+<pre class="bash"><code>find /home/bbaumer/Dropbox/ -type f -name &quot;*.Rmd&quot; -mtime -7 -exec cp -t /tmp {} \;
+
+find /home/bbaumer/Dropbox/ -type f -regex &quot;.+Rproj\.user.+conflicted copy.+\.pper&quot; -print0 | xargs -0 cp -t /tmp</code></pre>
+<ol style="list-style-type: decimal">
+<li>Find and replace across files</li>
+</ol>
+<pre class="bash"><code>grep &quot;dplyr&quot; *.Rmd
+sed -i &#39;s/dplyr/hello-dplyr/g&#39; *.Rmd
+grep &quot;hello-dplyr&quot; *.Rmd</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><a href="https://www.tecmint.com/rename-multiple-files-in-linux/">Rename</a> a large set of files in nested directories</li>
+</ol>
+<p id="license">
+Created by Ben Baumer
+</p>
+</div>
+
+    <div id="footer">
+        <p class="muted credit" id="license">Created by <a href="http://www.science.smith.edu/~bbaumer">Ben Baumer</a>.</p>
+    </div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

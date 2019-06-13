@@ -1,0 +1,67 @@
+name: "bootcamp"
+output_dir: "docs"
+include: "gfx"
+exclude: ["makefile", "data-raw", "my_path.txt"]
+navbar:
+  title: "Bootcamp"
+  left:
+    - text: "Home"
+      icon: fa-home
+      href: index.html
+    - text: "bash"
+      icon: fa-terminal
+      href: bash.html
+    - text: "git"
+      icon: fa-github
+      href: git.html
+    - text: "SQL"
+      icon: fa-database
+      menu: 
+        - text: "dplyr and SQL"
+          href: dplyr.html
+        - text: "Slides"
+          href: slides/sql_slides.html
+        - text: "Introduction"
+          href: intro.html
+        - text: "Getting Started with PostgreSQL"
+          href: postgres.html
+        - text: "Writing Queries"
+          href: queries.html
+        - text: "Joining Two Tables"
+          href: join.html
+        - text: "Aggregating Results"
+          href: aggregating.html
+        - text: "Table Structure"
+          href: structure.html
+        - text: "Creating Tables"
+          href: create.html
+    - text: Data
+      icon: fa-download
+      menu: 
+        - text: "IMDB"
+          href: https://www.science.smith.edu/~bbaumer/data/imdb.backup
+        - text: "Baseball"
+          href: https://www.science.smith.edu/~bbaumer/data/lahman.backup
+        - text: "Airlines"
+          href: https://www.science.smith.edu/~bbaumer/data/airlines.backup
+        - text: "Airlines (ETL)"
+          href: https://github.com/beanumber/airlines
+        - text: "FEC (ETL)"
+          href: https://github.com/beanumber/fec
+    - text: Resources
+      icon: fa-hands-helping
+      href: resources.html
+  right:
+    - text: beanumber
+      icon: fa-github
+      href: https://github.com/beanumber
+output:
+  html_document:
+    theme: united
+    highlight: textmate
+    css: include/beanumber.css
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    include:
+      after_body: include/after_body.html
