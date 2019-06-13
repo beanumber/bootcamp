@@ -12,18 +12,32 @@ h2 {
 
 /* define Smith-specific colors */
 
-.navbar-inner {
+.navbar {
   background-color: #002f5f;
   background-image: linear-gradient(to bottom, #002f5f, #003f80);
-  border: 1px solid #f4ac00;
+  border: 0 1px 0 0 solid #f4ac00;
 }
 
-.navbar .nav > li > a {
+.navbar-nav > .active > a {
   text-shadow: 0px 1px 0px #f4ac00;
+  background-color: #f4ac00;
 }
 
 .navbar .brand {
   text-shadow: 0px 1px 0px #f4ac00;
+}
+
+a {
+  color: #f4ac00;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover  {
+  background-color: #f4ac00;
+}
+
+img {
+  display: block;
+  margin: auto;
 }
 
 body {
