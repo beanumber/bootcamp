@@ -1,10 +1,5 @@
 ---
 title: "Crash course in bash"
-author: "Ben Baumer"
-date: "6/10/2019"
-output: 
-  html_document:
-    css: northampton.css
 ---
 
 ```{r, message=FALSE}
@@ -196,5 +191,3 @@ grep "hello-dplyr" *.Rmd
 ```
 
 2. [Rename](https://www.tecmint.com/rename-multiple-files-in-linux/) a large set of files in nested directories
-
-<p id="license">Created by Ben Baumer</p>
