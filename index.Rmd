@@ -4,6 +4,8 @@ title: "Schedule"
 
 # Day Zero
 
+- [course website](https://beanumber.github.io/bootcamp/)
+- [course repo](https://github.com/beanumber/bootcamp)
 - bash
 - git
 
@@ -47,4 +49,5 @@ title: "Schedule"
 # Day Three & Four
 
 - SQL Challenge
+
 

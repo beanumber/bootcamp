@@ -478,7 +478,7 @@ div.tocify {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/beanumber">
+  <a href="https://github.com/beanumber/bootcamp">
     <span class="fa fa-github"></span>
      
     beanumber
@@ -580,8 +580,8 @@ class(db)</code></pre>
 <pre class="r"><code>str(db)</code></pre>
 <pre><code>## List of 2
 ##  $ con  :Formal class &#39;PostgreSQLConnection&#39; [package &quot;RPostgreSQL&quot;] with 1 slot
-##   .. ..@ Id: int [1:2] 16640 0
-##  $ disco:&lt;environment: 0x6064d78&gt; 
+##   .. ..@ Id: int [1:2] 11373 0
+##  $ disco:&lt;environment: 0x5564f4c3d090&gt; 
 ##  - attr(*, &quot;class&quot;)= chr [1:4] &quot;src_PostgreSQLConnection&quot; &quot;src_dbi&quot; &quot;src_sql&quot; &quot;src&quot;</code></pre>
 <p>Connect to a real database</p>
 <pre class="r"><code>library(tidyverse)
@@ -607,9 +607,9 @@ movies</code></pre>
 ## # … with more rows</code></pre>
 <p>Compare memory footprints</p>
 <pre class="r"><code>print(object.size(movies), units = &quot;Kb&quot;)</code></pre>
-<pre><code>## 3.5 Kb</code></pre>
+<pre><code>## 3.8 Kb</code></pre>
 <pre class="r"><code>print(object.size(movies %&gt;% collect()), units = &quot;Kb&quot;)</code></pre>
-<pre><code>## 142.1 Kb</code></pre>
+<pre><code>## 154.7 Kb</code></pre>
 <pre class="r"><code>DBI::dbGetQuery(db$con, &quot;SELECT people.name, 
            COUNT(DISTINCT movies.title) as num_films 
            FROM movies 

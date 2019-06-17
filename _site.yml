@@ -54,7 +54,7 @@ navbar:
   right:
     - text: beanumber
       icon: fa-github
-      href: https://github.com/beanumber
+      href: https://github.com/beanumber/bootcamp
 output:
   html_document:
     theme: united
