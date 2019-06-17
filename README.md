@@ -9,3 +9,7 @@ https://beanumber.github.io/bootcamp/
 
 # About Me
 I'm learning how to cook one recipe at a time. 
+- [Emily Dzwil](git@github.com:edzwilmm/bootcamp.git)
+- [Edwood Brice](github.com/edwoodbrice-MM)
+- [Amy Gao](github.com/amygao1997)
+
