@@ -6,4 +6,4 @@ https://beanumber.github.io/bootcamp/
 
 ## Students in this course include
 
-[Emily Dzwil](https://github.com/edzwilmm/)
+[Emily Dzwil](git@github.com:edzwilmm/bootcamp.git)
