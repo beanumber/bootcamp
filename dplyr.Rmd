@@ -30,13 +30,13 @@ Get some results
 mtcars %>%
   group_by(cyl) %>%
   summarize(N = n(), avg_mpg = mean(mpg), 
-            broken = paste(mean(mpg), mean(disp), sep = "-"))
+            range = paste(mean(mpg), mean(disp), sep = "-"))
 
-# breaks
+# works now, but didn't use to!
 mtcars2 %>%
   group_by(cyl) %>%
   summarize(N = n(), avg_mpg = mean(mpg), 
-            broken = paste(mean(mpg), mean(disp), sep = "-")) %>%
+            range = paste(mean(mpg), mean(disp), sep = "-")) %>%
   show_query()
 
 mtcars3 <- mtcars2 %>% 
@@ -49,7 +49,7 @@ mtcars3 <- mtcars2 %>%
 mtcars2 %>%
   group_by(cyl) %>%
   summarize(N = n(), avg_mpg = mean(mpg), 
-            broken = avg(mpg) %||% "-" %||% mean(disp)) %>%
+            range = avg(mpg) %||% "-" %||% mean(disp)) %>%
   show_query()
 ```
 
@@ -57,7 +57,11 @@ mtcars2 %>%
 
 ```{r}
 library(tidyverse)
-db <- src_postgres(dbname = "postgres", host = "localhost", port = 5432, user = "postgres", password = "postgres")
+db <- src_postgres(
+  dbname = "postgres", 
+  host = "localhost", port = 5432, 
+  user = "postgres", password = "postgres"
+)
 class(db)
 str(db)
 ```
@@ -66,7 +70,11 @@ Connect to a real database
 
 ```{r}
 library(tidyverse)
-db <- src_postgres(dbname = "imdb", host = "localhost", port = 5432, user = "postgres", password = "postgres")
+db <- src_postgres(
+  dbname = "imdb", 
+  host = "localhost", port = 5432, 
+  user = "postgres", password = "postgres"
+)
 src_tbls(db)
 movies <- tbl(db, "movies")
 movies

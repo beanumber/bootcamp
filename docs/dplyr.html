@@ -538,24 +538,24 @@ dim(mtcars2)</code></pre>
 mtcars %&gt;%
   group_by(cyl) %&gt;%
   summarize(N = n(), avg_mpg = mean(mpg), 
-            broken = paste(mean(mpg), mean(disp), sep = &quot;-&quot;))</code></pre>
+            range = paste(mean(mpg), mean(disp), sep = &quot;-&quot;))</code></pre>
 <pre><code>## # A tibble: 3 x 4
-##     cyl     N avg_mpg broken                           
+##     cyl     N avg_mpg range                            
 ##   &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                            
 ## 1     4    11    26.7 26.6636363636364-105.136363636364
 ## 2     6     7    19.7 19.7428571428571-183.314285714286
 ## 3     8    14    15.1 15.1-353.1</code></pre>
-<pre class="r"><code># breaks
+<pre class="r"><code># works now, but didn&#39;t use to!
 mtcars2 %&gt;%
   group_by(cyl) %&gt;%
   summarize(N = n(), avg_mpg = mean(mpg), 
-            broken = paste(mean(mpg), mean(disp), sep = &quot;-&quot;)) %&gt;%
+            range = paste(mean(mpg), mean(disp), sep = &quot;-&quot;)) %&gt;%
   show_query()</code></pre>
 <pre><code>## &lt;SQL&gt;</code></pre>
 <pre><code>## Warning: Missing values are always removed in SQL.
 ## Use `mean(x, na.rm = TRUE)` to silence this warning
 ## This warning is displayed only once per session.</code></pre>
-<pre><code>## SELECT `cyl`, COUNT() AS `N`, AVG(`mpg`) AS `avg_mpg`, AVG(`mpg`) || &#39;-&#39; || AVG(`disp`) AS `broken`
+<pre><code>## SELECT `cyl`, COUNT() AS `N`, AVG(`mpg`) AS `avg_mpg`, AVG(`mpg`) || &#39;-&#39; || AVG(`disp`) AS `range`
 ## FROM `.`
 ## GROUP BY `cyl`</code></pre>
 <pre class="r"><code>mtcars3 &lt;- mtcars2 %&gt;% 
@@ -564,28 +564,36 @@ mtcars2 %&gt;%
 mtcars2 %&gt;%
   group_by(cyl) %&gt;%
   summarize(N = n(), avg_mpg = mean(mpg), 
-            broken = avg(mpg) %||% &quot;-&quot; %||% mean(disp)) %&gt;%
+            range = avg(mpg) %||% &quot;-&quot; %||% mean(disp)) %&gt;%
   show_query()</code></pre>
 <pre><code>## &lt;SQL&gt;
-## SELECT `cyl`, COUNT() AS `N`, AVG(`mpg`) AS `avg_mpg`, avg(`mpg`) || &#39;-&#39; || AVG(`disp`) AS `broken`
+## SELECT `cyl`, COUNT() AS `N`, AVG(`mpg`) AS `avg_mpg`, avg(`mpg`) || &#39;-&#39; || AVG(`disp`) AS `range`
 ## FROM `.`
 ## GROUP BY `cyl`</code></pre>
 <div id="connect-to-postgresql" class="section level2">
 <h2>Connect to PostgreSQL</h2>
 <pre class="r"><code>library(tidyverse)
-db &lt;- src_postgres(dbname = &quot;postgres&quot;, host = &quot;localhost&quot;, port = 5432, user = &quot;postgres&quot;, password = &quot;postgres&quot;)
+db &lt;- src_postgres(
+  dbname = &quot;postgres&quot;, 
+  host = &quot;localhost&quot;, port = 5432, 
+  user = &quot;postgres&quot;, password = &quot;postgres&quot;
+)
 class(db)</code></pre>
 <pre><code>## [1] &quot;src_PostgreSQLConnection&quot; &quot;src_dbi&quot;                 
 ## [3] &quot;src_sql&quot;                  &quot;src&quot;</code></pre>
 <pre class="r"><code>str(db)</code></pre>
 <pre><code>## List of 2
 ##  $ con  :Formal class &#39;PostgreSQLConnection&#39; [package &quot;RPostgreSQL&quot;] with 1 slot
-##   .. ..@ Id: int [1:2] 11373 0
-##  $ disco:&lt;environment: 0x5564f4c3d090&gt; 
+##   .. ..@ Id: int [1:2] 20901 0
+##  $ disco:&lt;environment: 0x559abc2be548&gt; 
 ##  - attr(*, &quot;class&quot;)= chr [1:4] &quot;src_PostgreSQLConnection&quot; &quot;src_dbi&quot; &quot;src_sql&quot; &quot;src&quot;</code></pre>
 <p>Connect to a real database</p>
 <pre class="r"><code>library(tidyverse)
-db &lt;- src_postgres(dbname = &quot;imdb&quot;, host = &quot;localhost&quot;, port = 5432, user = &quot;postgres&quot;, password = &quot;postgres&quot;)
+db &lt;- src_postgres(
+  dbname = &quot;imdb&quot;, 
+  host = &quot;localhost&quot;, port = 5432, 
+  user = &quot;postgres&quot;, password = &quot;postgres&quot;
+)
 src_tbls(db)</code></pre>
 <pre><code>## [1] &quot;movies&quot;    &quot;people&quot;    &quot;role_type&quot; &quot;cast_info&quot;</code></pre>
 <pre class="r"><code>movies &lt;- tbl(db, &quot;movies&quot;)
